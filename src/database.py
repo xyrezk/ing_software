@@ -4,8 +4,8 @@ import os
 def get_db_path():
    
     dir_actual = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.dirname(dir_actual)
-    return os.path.join(project_root, "gestor_academico.db")
+    ruta_proyecto = os.path.dirname(dir_actual)
+    return os.path.join(ruta_proyecto, "gestor_academico.db")
 
 def init_db():
     db_path = get_db_path()  
