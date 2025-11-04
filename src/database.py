@@ -1,7 +1,15 @@
 import sqlite3
+import os
+
+def get_db_path():
+   
+    dir_actual = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(dir_actual)
+    return os.path.join(project_root, "gestor_academico.db")
 
 def init_db():
-    conn = sqlite3.connect("gestor_academico.db")
+    db_path = get_db_path()  
+    conn = sqlite3.connect(db_path) 
     cursor = conn.cursor()
 
     
@@ -10,13 +18,13 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             email TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL,
-            nombre TEXT NOT NULL,
+            nombre TEXT NOT NULL
         )
     ''')
 
     
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS tasks (
+        CREATE TABLE IF NOT EXISTS tarea (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             usuario_id INTEGER,
             titulo TEXT NOT NULL,
@@ -34,7 +42,8 @@ def init_db():
 
 def get_connection():
     try:
-        conn = sqlite3.connect("gestor_academico.db")
+        db_path = get_db_path()
+        conn = sqlite3.connect(db_path)
         print("Conexión a la base de datos establecida correctamente.")
         return conn
     except sqlite3.Error as e:
