@@ -9,7 +9,7 @@ def mostrar_tareas(tareas):
     
     print("\n TUS TAREAS:")
     for tarea in tareas:
-        """estado = "✅" if tarea[6] == "completada" else "⏳" """
+        
         print(f"{tarea[0]}. - Estado: {tarea[6]} {tarea[2]} - Vence: {tarea[4]} - Prioridad: {tarea[5]}")
 
 def main():
@@ -18,7 +18,7 @@ def main():
 
     while True:
         print("\n" + "="*50)
-        print("📚 SISTEMA DE GESTIÓN ACADÉMICA")
+        print(" SISTEMA DE GESTIÓN ACADÉMICA")
         print("="*50)
         
         if not usuario_actual:
@@ -148,5 +148,5 @@ def main():
             else:
                 print(" Opción inválida")
 
-if __name__ == "main":
+if __name__ == "__main__":
     main()    
