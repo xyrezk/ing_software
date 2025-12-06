@@ -32,6 +32,8 @@ def init_db():
             entrega DATE,
             prioridad TEXT,
             estado TEXT DEFAULT 'pendiente',
+            tipo TEXT DEFAULT 'tarea',  -- 'tarea', 'examen', 'proyecto', etc.
+            recordatorio_dias INTEGER DEFAULT 1,  -- días de anticipación
             FOREIGN KEY(usuario_id) REFERENCES usuario(id)
         )
     ''')
