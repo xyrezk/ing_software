@@ -259,7 +259,7 @@ def main():
                     
                     tarea_actual = next((t for t in tareas if str(t[0]) == tarea_id), None)
                     if tarea_actual:
-                        dias_actual = tarea_actual[9] if len(tarea_actual) > 9 and tarea_actual[9] is not None else 1
+                        dias_actual = tarea_actual[8] if len(tarea_actual) > 8 and tarea_actual[8] is not None else 1
                         print(f"Recordatorio actual: {dias_actual} día(s) antes")
                         
                         dias = input("Nuevos días de anticipación (1-7): ")

@@ -35,10 +35,9 @@ def obtener_recordatorios_inmediatos(usuario_id):
     for tarea in todas:
         fecha_tarea = convertir_formato_fecha(tarea[4])
         if fecha_tarea:
-            # Índices ajustados: tarea[9] es recordatorio_dias, tarea[10] es materia
             try:
-                if len(tarea) > 9 and tarea[9] is not None:
-                    recordatorio_dias = int(tarea[9])
+                if len(tarea) > 8 and tarea[8] is not None:
+                    recordatorio_dias = int(tarea[8])
                 else:
                     recordatorio_dias = 1
             except (ValueError, TypeError):
@@ -78,8 +77,8 @@ def mostrar_recordatorios(recordatorios):
     if otras:
         print("OTRAS TAREAS:")
         for tarea in otras:
-            tipo = tarea[7] if len(tarea) > 7 else 'tarea'
             color = tarea[10] if len(tarea) > 10 else '🔵'
+            tipo = tarea[7] if len(tarea) > 7 else 'tarea'
             print(f"{color} - {tarea[2]} [{tipo.upper()}]")
     print(f"Total: {recordatorios['total']} tareas")
     print("--"*25)
@@ -97,8 +96,8 @@ def mostrar_proximas_tareas(usuario_id, dias=7):
         fecha_tarea = convertir_formato_fecha(tarea[4])
         if fecha_tarea:
             try:
-                if len(tarea) > 9 and tarea[9] is not None:
-                    recordatorio_dias = int(tarea[9])
+                if len(tarea) > 8 and tarea[8] is not None:
+                    recordatorio_dias = int(tarea[8])
                 else:
                     recordatorio_dias = 1
             except (ValueError, TypeError):
@@ -118,8 +117,7 @@ def mostrar_proximas_tareas(usuario_id, dias=7):
     for tarea, fecha, fecha_recordatorio in proximas:
         dias_restantes = (fecha - hoy).days
         tipo = tarea[7] if len(tarea) > 7 else 'tarea'
-        materia_info = f" [{tarea[9]}]" if len(tarea) > 9 and tarea[9] else ""
-        color = tarea[10] if len(tarea) > 10 else '🔵'
+        materia_info = f" [{tarea[10]}]" if len(tarea) > 10 and tarea[10] else ""
         
         if fecha_recordatorio == hoy:
             cuando = "RECORDATORIO HOY"
@@ -129,7 +127,7 @@ def mostrar_proximas_tareas(usuario_id, dias=7):
             dias_recordatorio = (fecha_recordatorio - hoy).days
             cuando = f"RECORDATORIO EN {dias_recordatorio} DÍAS"
         
-        print(f"{color} - {tarea[2]}{materia_info} [{tipo.upper()}] - Entrega en {dias_restantes} días ({cuando})")
+        print(f"- {tarea[2]}{materia_info} [{tipo.upper()}] - Entrega en {dias_restantes} días ({cuando})")
 
 def configurar_recordatorio(tarea_id, dias):
     conn = get_connection()
