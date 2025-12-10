@@ -8,6 +8,28 @@ from recordatorios import (mostrar_recordatorios, obtener_recordatorios_inmediat
                           mostrar_proximas_tareas, configurar_recordatorio,
                           verificar_tareas_vencidas)
 
+def mostrar_colores():
+    print("\nCOLORES DISPONIBLES:")
+    print("🔵 - Azul (Por defecto)")
+    print("🔴 - Rojo (Importante/Urgente)")
+    print("🟢 - Verde (Completado/Fácil)")
+    print("🟡 - Amarillo (Advertencia)")
+    print("🟣 - Morado (Creativo/Personal)")
+    print("⚫ - Negro (Secreto/Confidencial)")
+    print("🟤 - Marrón (Investigación)")
+    print("⚪ - Blanco (General)")
+    return {
+        'azul': '🔵',
+        'rojo': '🔴',
+        'verde': '🟢',
+        'amarillo': '🟡',
+        'morado': '🟣',
+        'negro': '⚫',
+        'marrón': '🟤',
+        'marron': '🟤',
+        'blanco': '⚪'
+    }
+
 def mostrar_tareas(tareas):
     if not tareas:
         print("No hay tareas registradas")
@@ -20,7 +42,9 @@ def mostrar_tareas(tareas):
         fecha = f" - Vence: {tarea[4]}" if tarea[4] else ""
         materia_info = f" - Materia: {tarea[10]}" if len(tarea) > 10 and tarea[10] else ""
         recordatorio_info = f" - Recordatorio: {tarea[9]} días antes" if len(tarea) > 9 and tarea[9] else ""
-        print(f"{tarea[0]}. {tipo_indicador} {estado} {tarea[2]}{materia_info} - Prioridad: {tarea[5]}{fecha}{recordatorio_info}")
+        color_emoji = tarea[10] if len(tarea) > 10 else '🔵'
+        
+        print(f"{tarea[0]}. {color_emoji} {tipo_indicador} {estado} {tarea[2]}{materia_info} - Prioridad: {tarea[5]}{fecha}{recordatorio_info}")
 
 def main():
     init_db()
@@ -40,7 +64,7 @@ def main():
                 print("\n" + "!"*60)
                 print("¡TIENES TAREAS VENCIDAS!")
                 print("!"*60)
-                for tarea in tareas_vencidas[:3]:  # Mostrar solo las 3 más antiguas
+                for tarea in tareas_vencidas[:3]:  
                     print(f"- {tarea[2]} - Vencida el {tarea[4]}")
         
         if not usuario_actual:
@@ -93,8 +117,9 @@ def main():
             print("10. Marcar tarea como pendiente")
             print("11. Ver proximas tareas (7 dias)")
             print("12. Configurar recordatorio")
-            print("13. Ver recordatorios de hoy")
-            print("14. Cerrar sesion")
+            print("13. Cambiar color de una tarea")
+            print("14. Ver recordatorios de hoy")
+            print("15. Cerrar sesion")
             
             opcion = input("\nSelecciona una opcion: ")
             
@@ -105,8 +130,11 @@ def main():
                 prioridad = input("Prioridad (alta/media/baja): ")
                 materia = input("Materia (opcional): ")
                 fecha = input("Fecha de entrega (YYYY-MM-DD, opcional): ") or None
-
-                if crear_tarea(usuario_actual[0], titulo, descripcion, prioridad, 'tarea', fecha, materia):
+                colores = mostrar_colores()
+                color_input = input("Color (escribe el nombre o presiona Enter para azul): ").lower()
+                color = colores.get(color_input, '🔵')  
+                
+                if crear_tarea(usuario_actual[0], titulo, descripcion, prioridad, 'tarea', fecha, materia, color):
                     print("Tarea creada exitosamente")
 
             elif opcion == "2":
@@ -116,8 +144,11 @@ def main():
                 materia = input("Materia (opcional): ")
                 prioridad = "alta"
                 fecha = input("Fecha del examen (YYYY-MM-DD): ")
+                colores = mostrar_colores()
+                color_input = input("Color (escribe el nombre o presiona Enter para azul): ").lower()
+                color = colores.get(color_input, '🔵')  # Default azul
 
-                if crear_examen(usuario_actual[0], titulo, descripcion, prioridad, fecha, materia):
+                if crear_examen(usuario_actual[0], titulo, descripcion, prioridad, fecha, materia, color):
                     print("Examen registrado exitosamente")
 
             elif opcion == "3":
@@ -127,8 +158,11 @@ def main():
                 prioridad = input("Prioridad (alta/media/baja): ")
                 materia = input("Materia (opcional): ")
                 fecha = input("Fecha de entrega (YYYY-MM-DD): ")
+                colores = mostrar_colores()
+                color_input = input("Color (escribe el nombre o presiona Enter para azul): ").lower()
+                color = colores.get(color_input, '🔵')  # Default azul
 
-                if crear_proyecto(usuario_actual[0], titulo, descripcion, prioridad, fecha, materia):
+                if crear_proyecto(usuario_actual[0], titulo, descripcion, prioridad, fecha, materia, color):
                     print("Proyecto creado exitosamente")
             elif opcion == "4":
                 tareas = obtener_tarea_usuario(usuario_actual[0])
@@ -152,6 +186,7 @@ def main():
                     prioridad = input("Nueva prioridad (dejar vacío para no cambiar): ")
                     materia = input("Nueva materia (dejar vacío para no cambiar, '-' para borrar): ")
                     fecha = input("Nueva fecha (YYYY-MM-DD, dejar vacío para no cambiar): ")
+                    color_input = input("Nuevo color (dejar vacío para no cambiar): ").lower()
 
                     tarea_actual = next((t for t in tareas if str(t[0]) == tarea_id), None)
                     if tarea_actual:
@@ -161,13 +196,18 @@ def main():
                         fecha = fecha if fecha != '' else tarea_actual[4]
 
                         if materia == '':
-                            materia_valor = tarea_actual[10] if len(tarea_actual) > 10 else ''
+                            materia_valor = tarea_actual[9] if len(tarea_actual) > 9 else ''
                         elif materia == '-':
                             materia_valor = ''
                         else:
                             materia_valor = materia
+                        if color_input:
+                            colores = mostrar_colores()
+                            color_valor = colores.get(color_input, tarea_actual[11] if len(tarea_actual) > 11 else '🔵')
+                        else:
+                            color_valor = tarea_actual[10] if len(tarea_actual) > 10 else '🔵'
 
-                        if actualizar_tarea(tarea_id, titulo, descripcion, prioridad, tarea_actual[7], fecha, materia_valor):
+                        if actualizar_tarea(tarea_id, titulo, descripcion, prioridad, tarea_actual[7], fecha, materia_valor, color_valor):
                             print("Tarea actualizada")
 
             elif opcion == "8":
@@ -237,10 +277,38 @@ def main():
                 else:
                     print("No hay tareas para configurar")
             elif opcion == "13":
+                tareas = obtener_tarea_usuario(usuario_actual[0])
+                if tareas:
+                    mostrar_tareas(tareas)
+                    tarea_id = input("\nID de la tarea para cambiar color: ")
+
+                    tarea_actual = next((t for t in tareas if str(t[0]) == tarea_id), None)
+                    if tarea_actual:
+                        colores = mostrar_colores()
+                        print(f"\nColor actual: {tarea_actual[10] if len(tarea_actual) > 10 else '🔵'}")
+                        color_input = input("Nuevo color (escribe el nombre): ").lower()
+
+                        if color_input in colores:
+                            if actualizar_tarea(tarea_id, 
+                                               tarea_actual[2], 
+                                               tarea_actual[3], 
+                                               tarea_actual[5], 
+                                               tarea_actual[7], 
+                                               tarea_actual[4], 
+                                               tarea_actual[10] if len(tarea_actual) > 10 else '',
+                                               colores[color_input]):
+                                print(f"Color cambiado a {colores[color_input]}")
+                            else:
+                                print("Error al cambiar el color")
+                        else:
+                            print("Color no válido")
+                else:
+                    print("No hay tareas para cambiar color")
+            elif opcion == "14":
                 recordatorios = obtener_recordatorios_inmediatos(usuario_actual[0])
                 mostrar_recordatorios(recordatorios)
                 
-            elif opcion == "14":
+            elif opcion == "15":
                 usuario_actual = logout_usuario()
                 
             else:

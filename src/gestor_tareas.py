@@ -2,24 +2,24 @@ import sqlite3
 from datetime import datetime
 from database import get_connection
 
-def crear_tarea(usuario_id, titulo, descripcion, prioridad, tipo='tarea', entrega=None, materia=''):
+def crear_tarea(usuario_id, titulo, descripcion, prioridad, tipo='tarea', entrega=None, materia='',color='🔵'):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute('''
         INSERT INTO tarea (usuario_id, titulo, descripcion, prioridad, tipo, entrega, materia)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    ''', (usuario_id, titulo, descripcion, prioridad, tipo, entrega, materia))
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (usuario_id, titulo, descripcion, prioridad, tipo, entrega, materia,color))
     conn.commit()
     conn.close()
     return True
 
-def crear_examen(usuario_id, titulo, descripcion, prioridad, entrega, materia=''):
-    return crear_tarea(usuario_id, titulo, descripcion, prioridad, 'examen', entrega, materia)
+def crear_examen(usuario_id, titulo, descripcion, prioridad, entrega, materia='',color='🔵'):
+    return crear_tarea(usuario_id, titulo, descripcion, prioridad, 'examen', entrega, materia, color)
 
-def crear_proyecto(usuario_id, titulo, descripcion, prioridad, entrega, materia=''):
-    return crear_tarea(usuario_id, titulo, descripcion, prioridad, 'proyecto', entrega, materia)
+def crear_proyecto(usuario_id, titulo, descripcion, prioridad, entrega, materia='',color='🔵'):
+    return crear_tarea(usuario_id, titulo, descripcion, prioridad, 'proyecto', entrega, materia,color)
 
-def actualizar_tarea(tarea_id, titulo, descripcion, prioridad, tipo=None, entrega=None, materia=None):
+def actualizar_tarea(tarea_id, titulo, descripcion, prioridad, tipo=None, entrega=None, materia=None,color=None):
     conn = get_connection()
     cursor = conn.cursor()
     
@@ -46,6 +46,10 @@ def actualizar_tarea(tarea_id, titulo, descripcion, prioridad, tipo=None, entreg
     if materia is not None:
         campos.append("materia = ?")
         valores.append(materia)
+        
+    if color is not None:
+        campos.append("color = ?")
+        valores.append(color)
     
     valores.append(tarea_id)
     

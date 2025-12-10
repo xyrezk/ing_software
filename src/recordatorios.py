@@ -72,13 +72,15 @@ def mostrar_recordatorios(recordatorios):
     if recordatorios['examenes_hoy']:
         print("EXÁMENES HOY:")
         for tarea in recordatorios['examenes_hoy']:
-            print(f"- {tarea[2]}")
+            color = tarea[10] if len(tarea) > 10 else '🔵'
+            print(f"{color} - {tarea[2]}")
     otras = [t for t in recordatorios['tareas_hoy'] if t not in recordatorios['examenes_hoy']]
     if otras:
         print("OTRAS TAREAS:")
         for tarea in otras:
             tipo = tarea[7] if len(tarea) > 7 else 'tarea'
-            print(f"- {tarea[2]} [{tipo.upper()}]")
+            color = tarea[10] if len(tarea) > 10 else '🔵'
+            print(f"{color} - {tarea[2]} [{tipo.upper()}]")
     print(f"Total: {recordatorios['total']} tareas")
     print("--"*25)
 
@@ -116,7 +118,8 @@ def mostrar_proximas_tareas(usuario_id, dias=7):
     for tarea, fecha, fecha_recordatorio in proximas:
         dias_restantes = (fecha - hoy).days
         tipo = tarea[7] if len(tarea) > 7 else 'tarea'
-        materia_info = f" [{tarea[10]}]" if len(tarea) > 10 and tarea[10] else ""
+        materia_info = f" [{tarea[9]}]" if len(tarea) > 9 and tarea[9] else ""
+        color = tarea[10] if len(tarea) > 10 else '🔵'
         
         if fecha_recordatorio == hoy:
             cuando = "RECORDATORIO HOY"
@@ -126,7 +129,7 @@ def mostrar_proximas_tareas(usuario_id, dias=7):
             dias_recordatorio = (fecha_recordatorio - hoy).days
             cuando = f"RECORDATORIO EN {dias_recordatorio} DÍAS"
         
-        print(f"- {tarea[2]}{materia_info} [{tipo.upper()}] - Entrega en {dias_restantes} días ({cuando})")
+        print(f"{color} - {tarea[2]}{materia_info} [{tipo.upper()}] - Entrega en {dias_restantes} días ({cuando})")
 
 def configurar_recordatorio(tarea_id, dias):
     conn = get_connection()

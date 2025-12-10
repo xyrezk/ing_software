@@ -35,6 +35,7 @@ def init_db():
             tipo TEXT DEFAULT 'tarea',  -- 'tarea', 'examen', 'proyecto', etc.
             recordatorio_dias INTEGER DEFAULT 1,
             materia TEXT DEFAULT '',
+            color TEXT DEFAULT '🔵',
             FOREIGN KEY(usuario_id) REFERENCES usuario(id)
         )
     ''')

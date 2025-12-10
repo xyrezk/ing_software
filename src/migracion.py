@@ -20,7 +20,12 @@ def migrar_base_datos():
             print("Agregando columna 'materia'...")
             cursor.execute("ALTER TABLE tarea ADD COLUMN materia TEXT DEFAULT ''")
             print("✓ Columna 'materia' agregada")
-        
+            
+        if 'color' not in columnas:
+            print("Agregando columna 'color'...")
+            cursor.execute("ALTER TABLE tarea ADD COLUMN color TEXT DEFAULT '🔵'")
+            print("✓ Columna 'color' agregada")
+            
         conn.commit()
         print("\nMigración completada exitosamente")
         
