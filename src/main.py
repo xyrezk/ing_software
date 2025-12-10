@@ -18,7 +18,9 @@ def mostrar_tareas(tareas):
         tipo_indicador = "[EXAMEN]" if tarea[7] == 'examen' else "[TAREA]" if tarea[7] == 'tarea' else "[PROYECTO]"
         estado = "[COMPLETADA]" if tarea[6] == 'completada' else "[PENDIENTE]"
         fecha = f" - Vence: {tarea[4]}" if tarea[4] else ""
-        print(f"{tarea[0]}. {tipo_indicador} {estado} {tarea[2]} - Prioridad: {tarea[5]}{fecha}")
+        materia_info = f" - Materia: {tarea[10]}" if len(tarea) > 10 and tarea[10] else ""
+        recordatorio_info = f" - Recordatorio: {tarea[9]} días antes" if len(tarea) > 9 and tarea[9] else ""
+        print(f"{tarea[0]}. {tipo_indicador} {estado} {tarea[2]}{materia_info} - Prioridad: {tarea[5]}{fecha}{recordatorio_info}")
 
 def main():
     init_db()
@@ -98,40 +100,36 @@ def main():
             
             if opcion == "1":
                 print("\n--- CREAR NUEVA TAREA ---")
-                titulo = input("Titulo de la tarea: ")
-                descripcion = input("Descripcion: ")
+                titulo = input("Título de la tarea: ")
+                descripcion = input("Descripción: ")
                 prioridad = input("Prioridad (alta/media/baja): ")
+                materia = input("Materia (opcional): ")
                 fecha = input("Fecha de entrega (YYYY-MM-DD, opcional): ") or None
-                
-                if crear_tarea(usuario_actual[0], titulo, descripcion, prioridad, 'tarea', fecha):
+
+                if crear_tarea(usuario_actual[0], titulo, descripcion, prioridad, 'tarea', fecha, materia):
                     print("Tarea creada exitosamente")
-                else:
-                    print("Error al crear la tarea")
-                    
+
             elif opcion == "2":
                 print("\n--- CREAR EXAMEN ---")
                 titulo = input("Materia del examen: ")
                 descripcion = input("Temas a evaluar: ")
-                prioridad = "alta"  
+                materia = input("Materia (opcional): ")
+                prioridad = "alta"
                 fecha = input("Fecha del examen (YYYY-MM-DD): ")
-                
-                if crear_examen(usuario_actual[0], titulo, descripcion, prioridad, fecha):
+
+                if crear_examen(usuario_actual[0], titulo, descripcion, prioridad, fecha, materia):
                     print("Examen registrado exitosamente")
-                else:
-                    print("Error al registrar el examen")
-                    
+
             elif opcion == "3":
                 print("\n--- CREAR PROYECTO ---")
                 titulo = input("Nombre del proyecto: ")
-                descripcion = input("Descripcion del proyecto: ")
+                descripcion = input("Descripción del proyecto: ")
                 prioridad = input("Prioridad (alta/media/baja): ")
+                materia = input("Materia (opcional): ")
                 fecha = input("Fecha de entrega (YYYY-MM-DD): ")
-                
-                if crear_proyecto(usuario_actual[0], titulo, descripcion, prioridad, fecha):
+
+                if crear_proyecto(usuario_actual[0], titulo, descripcion, prioridad, fecha, materia):
                     print("Proyecto creado exitosamente")
-                else:
-                    print("Error al crear el proyecto")
-                    
             elif opcion == "4":
                 tareas = obtener_tarea_usuario(usuario_actual[0])
                 mostrar_tareas(tareas)
@@ -149,25 +147,29 @@ def main():
                 if tareas:
                     mostrar_tareas(tareas)
                     tarea_id = input("\nID de la tarea a editar: ")
-                    titulo = input("Nuevo titulo (dejar vacio para no cambiar): ")
-                    descripcion = input("Nueva descripcion (dejar vacio para no cambiar): ")
-                    prioridad = input("Nueva prioridad (dejar vacio para no cambiar): ")
-                    fecha = input("Nueva fecha (YYYY-MM-DD, dejar vacio para no cambiar): ")
-                    
+                    titulo = input("Nuevo título (dejar vacío para no cambiar): ")
+                    descripcion = input("Nueva descripción (dejar vacío para no cambiar): ")
+                    prioridad = input("Nueva prioridad (dejar vacío para no cambiar): ")
+                    materia = input("Nueva materia (dejar vacío para no cambiar, '-' para borrar): ")
+                    fecha = input("Nueva fecha (YYYY-MM-DD, dejar vacío para no cambiar): ")
+
                     tarea_actual = next((t for t in tareas if str(t[0]) == tarea_id), None)
                     if tarea_actual:
                         titulo = titulo or tarea_actual[2]
                         descripcion = descripcion or tarea_actual[3]
                         prioridad = prioridad or tarea_actual[5]
-                        fecha = fecha or tarea_actual[4]
-                        
-                        if actualizar_tarea(tarea_id, titulo, descripcion, prioridad, tarea_actual[7], fecha):
-                            print("Tarea actualizada")
+                        fecha = fecha if fecha != '' else tarea_actual[4]
+
+                        if materia == '':
+                            materia_valor = tarea_actual[10] if len(tarea_actual) > 10 else ''
+                        elif materia == '-':
+                            materia_valor = ''
                         else:
-                            print("Error al actualizar")
-                else:
-                    print("No hay tareas para editar")
-                    
+                            materia_valor = materia
+
+                        if actualizar_tarea(tarea_id, titulo, descripcion, prioridad, tarea_actual[7], fecha, materia_valor):
+                            print("Tarea actualizada")
+
             elif opcion == "8":
                 tareas = obtener_tarea_usuario(usuario_actual[0])
                 if tareas:
@@ -214,21 +216,26 @@ def main():
                 if tareas:
                     mostrar_tareas(tareas)
                     tarea_id = input("\nID de la tarea para configurar recordatorio: ")
-                    dias = input("Dias de anticipacion para el recordatorio (1-7): ")
-                    try:
-                        dias_int = int(dias)
-                        if 1 <= dias_int <= 7:
-                            if configurar_recordatorio(tarea_id, dias_int):
-                                print(f"Recordatorio configurado para {dias_int} dias antes")
+                    
+                    tarea_actual = next((t for t in tareas if str(t[0]) == tarea_id), None)
+                    if tarea_actual:
+                        dias_actual = tarea_actual[9] if len(tarea_actual) > 9 and tarea_actual[9] is not None else 1
+                        print(f"Recordatorio actual: {dias_actual} día(s) antes")
+                        
+                        dias = input("Nuevos días de anticipación (1-7): ")
+                        try:
+                            dias_int = int(dias)
+                            if 1 <= dias_int <= 7:
+                                if configurar_recordatorio(tarea_id, dias_int):
+                                    print(f"Recordatorio configurado para {dias_int} días antes")
+                                else:
+                                    print("Error al configurar recordatorio")
                             else:
-                                print("Error al configurar recordatorio")
-                        else:
-                            print("Los dias deben estar entre 1 y 7")
-                    except ValueError:
-                        print("Ingresa un numero valido")
+                                print("Los días deben estar entre 1 y 7")
+                        except ValueError:
+                            print("Ingresa un número válido")
                 else:
                     print("No hay tareas para configurar")
-                    
             elif opcion == "13":
                 recordatorios = obtener_recordatorios_inmediatos(usuario_actual[0])
                 mostrar_recordatorios(recordatorios)

@@ -13,26 +13,19 @@ def migrar_base_datos():
     cursor = conn.cursor()
     
     try:
-        
         cursor.execute("PRAGMA table_info(tarea)")
         columnas = [col[1] for col in cursor.fetchall()]
-        print("Columnas actuales en tabla 'tarea':", columnas)
         
-        if 'tipo' not in columnas:
-            print("Agregando columna 'tipo'...")
-            cursor.execute("ALTER TABLE tarea ADD COLUMN tipo TEXT DEFAULT 'tarea'")
-            print("✓ Columna 'tipo' agregada")
-        
-        if 'recordatorio_dias' not in columnas:
-            print("Agregando columna 'recordatorio_dias'...")
-            cursor.execute("ALTER TABLE tarea ADD COLUMN recordatorio_dias INTEGER DEFAULT 1")
-            print("✓ Columna 'recordatorio_dias' agregada")
+        if 'materia' not in columnas:
+            print("Agregando columna 'materia'...")
+            cursor.execute("ALTER TABLE tarea ADD COLUMN materia TEXT DEFAULT ''")
+            print("✓ Columna 'materia' agregada")
         
         conn.commit()
-        print("\n Migración completada exitosamente")
+        print("\nMigración completada exitosamente")
         
     except sqlite3.Error as e:
-        print(f" Error en migración: {e}")
+        print(f"Error en migración: {e}")
     finally:
         conn.close()
 
