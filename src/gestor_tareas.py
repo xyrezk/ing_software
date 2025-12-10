@@ -6,7 +6,7 @@ def crear_tarea(usuario_id, titulo, descripcion, prioridad, tipo='tarea', entreg
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO tarea (usuario_id, titulo, descripcion, prioridad, tipo, entrega, materia)
+        INSERT INTO tarea (usuario_id, titulo, descripcion, prioridad, tipo, entrega, materia, color)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ''', (usuario_id, titulo, descripcion, prioridad, tipo, entrega, materia,color))
     conn.commit()
